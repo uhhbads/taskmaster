@@ -1,0 +1,16 @@
+[project]
+name = "taskmaster"
+version = "1.0.0"
+description = "A CLI application to manage tasks."
+requires-python = ">=3.7"
+dependencies = ["fastapi", "uvicorn"]
+
+[project.scripts]
+taskmaster = "cli:main"
+
+[tool.setuptools]
+py-modules = ["cli", "main", "services"] 
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -25,17 +25,22 @@ taskmaster/
 
 ## Usage
 
+Install the package with:
+```bash
+pip install -e .
+```
+
 ### Command Line Interface (CLI)
 
 Run commands using the following format:
 ```bash
-python cli.py  [arguments]
+taskmaster  [arguments]
 ```
 
 #### Add a New Task
 ```bash
-python cli.py add "Buy groceries"
-python cli.py add "Complete project documentation"
+taskmaster add "Buy groceries"
+taskmaster add "Complete project documentation"
 ```
 
 **Output:**
@@ -55,27 +60,27 @@ python cli.py add "Complete project documentation"
 
 #### Update a Task
 ```bash
-python cli.py update 1 "Buy groceries and cook dinner"
+taskmaster update 1 "Buy groceries and cook dinner"
 ```
 
 #### Mark Task as In Progress
 ```bash
-python cli.py mark-in-progress 1
+taskmaster mark-in-progress 1
 ```
 
 #### Mark Task as Done
 ```bash
-python cli.py mark-done 1
+taskmaster mark-done 1
 ```
 
 #### Delete a Task
 ```bash
-python cli.py delete 1
+taskmaster delete 1
 ```
 
 #### List All Tasks
 ```bash
-python cli.py list
+taskmaster list
 ```
 
 **Output:**
@@ -92,13 +97,13 @@ python cli.py list
 #### List Tasks by Status
 ```bash
 # List only completed tasks
-python cli.py list done
+taskmaster list done
 
 # List tasks in progress
-python cli.py list in-progress
+taskmaster list in-progress
 
 # List pending tasks
-python cli.py list todo
+taskmaster list todo
 ```
 
 ### FastAPI

@@ -3,7 +3,7 @@ import asyncio
 import json
 from services import create_task_logic, _update_task, delete_task_logic, _list_task
 
-if __name__ == "__main__":
+def main():
     try:
         parser = argparse.ArgumentParser(description='taskmaster project')
         
@@ -52,3 +52,6 @@ if __name__ == "__main__":
             print(json.dumps(result, indent=2))
     except KeyboardInterrupt:
         print("\nExiting")
+
+if __name__ == "__main__":
+    main()
