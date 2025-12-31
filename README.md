@@ -1,4 +1,4 @@
-# TASK MASTER
+# Taskmaster
 
 CLI-only small project using Python and FastAPI
 
@@ -14,7 +14,7 @@ CLI-only small project using Python and FastAPI
 
 ## Project Structure
 ```
-task-tracker/
+taskmaster/
 ├── main.py          # FastAPI routes (API endpoints)
 ├── services.py      # Business logic
 ├── cli.py           # Command-line interface
@@ -99,3 +99,6 @@ python cli.py list in-progress
 # List pending tasks
 python cli.py list todo
 ```
+
+### FastAPI
+I was just practicing ok
