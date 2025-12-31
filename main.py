@@ -31,14 +31,14 @@ async def create_task(task: str):
             "id": new_id,
             "description": task,
             "status": "todo",
-            "createdAt": datetime.today(),
-            "updatedAt": datetime.today()
+            "createdAt": datetime.now().isoformat("#", "minutes"),
+            "updatedAt": datetime.now().isoformat("#", "minutes")
             }
 
     datafile.append(data)
 
     with open("data.json", "w") as jsondata:
-        json.dump(sorted(datafile, key=lambda x:x["id"]), jsondata, default=str, indent=4)
+        json.dump(sorted(datafile, key=lambda x:x["id"]), jsondata, indent=4)
 
     return {
             "success": True,
@@ -91,12 +91,18 @@ async def _update_task(id: int, new_task: str = None, status: str = None):
         task_to_update["description"] = new_task
     
     if status is not None:
+        valid_statuses = ["todo", "in-progress", "done"]
+        if status not in valid_statuses:
+            return {
+                    "success": False,
+                    "error": f"{status} is an invalid status."
+                    }
         task_to_update["status"] = status
-    
-    task_to_update["updatedAt"] = datetime.today()
+
+    task_to_update["updatedAt"] = datetime.now().isoformat("#", "minutes")
 
     with open("data.json", "w") as jsondata:
-        json.dump(sorted(datafile, key=lambda x: x["id"]), jsondata, default=str, indent=4)
+        json.dump(sorted(datafile, key=lambda x: x["id"]), jsondata, indent=4)
 
     return {
             "success": True,
@@ -112,7 +118,7 @@ async def delete_task(id: int):
     except FileNotFoundError:
         return {
                 "success": False,
-                "message": "Create a task first!"
+                "error": "Create a task first!"
                 }
 
     original_length = len(datafile)
@@ -121,11 +127,11 @@ async def delete_task(id: int):
     if len(updated_data) == original_length:
         return {
                 "success": False,
-                "message": f"ID: {id} not found."
+                "error": f"ID: {id} not found."
                 }
 
     with open("data.json", "w") as jsondata:
-        json.dump(updated_data, jsondata, default=str, indent=4)
+        json.dump(updated_data, jsondata, indent=4)
 
     return {
             "success": True,
@@ -153,17 +159,18 @@ async def _list_task(status: str = None):
     if status is None:
         return {
                 "success": True,
-                "data": [task["description"] for task in datafile]
+                "data": [{"id": task["id"], "description": task["description"]} for task in datafile]
                 }
     
-    filtered = [task["description"] for task in datafile if task["status"] == status]
-
-    if not filtered and status not in ["done", "todo", "in-progress"]:
+    valid_statuses = ["done", "todo", "in-progress"]
+    if status not in valid_statuses:
         return {
                 "success": False,
-                "error": f"{status} status is invalid"
-                }
-    
+                "error": f"{status} is an invalid status."
+                }    
+
+    filtered = [{"id": task["id"], "description": task["description"]} for task in datafile if task["status"] == status]
+
     return {
             "success": True,
             "data": filtered
