@@ -9,8 +9,13 @@ app = FastAPI()
 async def root():
     return {"message": "Hello, World!"}
 
-@app.post("/create/{task}")
+@app.post("/add/{task}")
 async def create_task(task: str):
+    if not task or task.strip() == "":
+        return {"success": False,
+                "error": "Enter a proper task."
+                }
+    
     try:
         with open("data.json", "r+") as jsondata:
             datafile = json.load(jsondata)
@@ -35,15 +40,33 @@ async def create_task(task: str):
     with open("data.json", "w") as jsondata:
         json.dump(sorted(datafile, key=lambda x:x["id"]), jsondata, default=str, indent=4)
 
-    return data
+    return {
+            "success": True,
+            "message": "Task created successfully",
+            "data": data
+            }
 
-@app.put("/update/{id}/{new_task}")
-async def update_task(id: int, new_task: str):
+@app.put("/update/{id}")
+async def update_task_description(id: int, description: str):
+    return await _update_task(id, new_task=description)
+
+@app.put("/mark-in-progress/{id}")
+async def mark_in_progress(id: int):
+    return await _update_task(id, status="in-progress")
+
+@app.put("/mark-done/{id}")
+async def mark_done(id: int):
+    return await _update_task(id, status="done")
+
+async def _update_task(id: int, new_task: str = None, status: str = None):
     try:
-        with open("data.json", "r+") as jsondata:
+        with open("data.json", "r") as jsondata:
             datafile = json.load(jsondata)
     except FileNotFoundError:
-        print("Create a task first!")
+        return {
+                "success": False,
+                "error": "Create a task first!"
+                }
 
     task_to_update = None
     for task in datafile:
@@ -52,16 +75,34 @@ async def update_task(id: int, new_task: str):
             break
 
     if task_to_update is None:
-        return "No task found."
+        return {
+                "success": False,
+                "error": "No task found."
+                }
 
-    task_to_update["description"] = new_task
+    # update only the fields that were provided
+    if new_task is not None:
+        if not new_task or new_task.strip() == "":
+            return {
+                    "success": False,
+                    "error": "Enter a proper task."
+                    }
+        
+        task_to_update["description"] = new_task
+    
+    if status is not None:
+        task_to_update["status"] = status
+    
     task_to_update["updatedAt"] = datetime.today()
 
     with open("data.json", "w") as jsondata:
         json.dump(sorted(datafile, key=lambda x: x["id"]), jsondata, default=str, indent=4)
 
-    print(f"Task with ID:{id} Updated.")
-    return f"Updated task #{id}"
+    return {
+            "success": True,
+            "message": f"Task {id} updated successfully", 
+            "updated_task": task_to_update
+            }
 
 @app.delete("/delete/{id}")
 async def delete_task(id: int):
@@ -69,16 +110,61 @@ async def delete_task(id: int):
         with open("data.json", "r+") as jsondata:
             datafile = json.load(jsondata)
     except FileNotFoundError:
-        print("Create a task first!")
+        return {
+                "success": False,
+                "message": "Create a task first!"
+                }
 
     original_length = len(datafile)
     updated_data = [task for task in datafile if task["id"] != id] 
 
     if len(updated_data) == original_length:
-        return f"ID: {id} not found."
+        return {
+                "success": False,
+                "message": f"ID: {id} not found."
+                }
 
     with open("data.json", "w") as jsondata:
         json.dump(updated_data, jsondata, default=str, indent=4)
 
-    print(f"Task with ID:{id} deleted.")
-    return f"Deleted task #{id}"
+    return {
+            "success": True,
+            "message": f"Deleted task #{id}"
+            }
+
+@app.get("/list")
+async def list_task():
+    return await _list_task(status=None)
+
+@app.get("/list/{status}")
+async def list_task_by_status(status: str):
+    return await _list_task(status)
+
+async def _list_task(status: str = None):
+    try:
+        with open("data.json", "r") as jsondata:
+            datafile = json.load(jsondata)
+    except FileNotFoundError:
+        return {
+                "success": False,
+                "error": "Create a task first!"
+                }
+
+    if status is None:
+        return {
+                "success": True,
+                "data": [task["description"] for task in datafile]
+                }
+    
+    filtered = [task["description"] for task in datafile if task["status"] == status]
+
+    if not filtered and status not in ["done", "todo", "in-progress"]:
+        return {
+                "success": False,
+                "error": f"{status} status is invalid"
+                }
+    
+    return {
+            "success": True,
+            "data": filtered
+            }

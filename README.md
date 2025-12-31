@@ -3,8 +3,8 @@ The application should run from the command line, accept user actions and inputs
 * Add tasks [DONE] 
 * Update tasks [DONE]
 * Delete tasks [DONE]
-* Mark a task as in progress or done
-* List all tasks
-* List all tasks that are done
-* List all tasks that are not done
-* List all tasks that are in progress
+* Mark a task as in progress or done [DONE]
+* List all tasks [DONE]
+* List all tasks that are done [DONE]
+* List all tasks that are not done [DONE]
+* List all tasks that are in progress [DONE]
